@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '17'
+        java-version: '8'
 
     - name: Download Android Emulator Image
       run: |
@@ -35,6 +35,7 @@ jobs:
     - name: Build for detox
       run: |
         yarn build:android-release
+      with: java-version: '8'
 
     - name: Android Emulator
       timeout-minutes: 10

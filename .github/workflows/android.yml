@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'adopt' # See 'Supported distributions' for available options
-        java-version: '8'
+        java-version: '11'
 
     - name: Download Android Emulator Image
       run: |
@@ -47,4 +47,4 @@ jobs:
         echo "Emulator started"
 
     - name: Android Detox
-      run: yarn test:ios-release
+      run: yarn test:android-release

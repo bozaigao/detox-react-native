@@ -19,8 +19,8 @@ jobs:
     - name: Use specific Java version for sdkmanager to work
       uses: actions/setup-java@v3
       with:
-        distribution: 'adopt' # See 'Supported distributions' for available options
-        java-version: '11'
+        java-version: '8'
+        distribution: 'temurin'
 
     - name: Download Android Emulator Image
       run: |
@@ -35,8 +35,8 @@ jobs:
     - name: Change java sdk version
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
-        distribution: 'temurin'
+        distribution: 'adopt' # See 'Supported distributions' for available options
+        java-version: '11'
     
     - name: Build for detox
       run: |

@@ -53,7 +53,7 @@ module.exports = {
       headless: Boolean(process.env.CI),
       gpuMode: process.env.CI ? 'off' : undefined,
       device: {
-        avdName: "emulator-5554"
+        avdName: "emu"
       },
       utilBinaryPaths: [
         "./cache/test-butler-app.apk"

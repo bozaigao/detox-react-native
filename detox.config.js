@@ -51,7 +51,7 @@ module.exports = {
     emulator: {
       type: "android.emulator",
       headless: Boolean(process.env.CI),
-      gpuMode: process.env.CI ? 'off' : undefined,
+      gpuMode: process.env.CI ? 'auto' : undefined,
       device: {
         avdName: "emu"
       },

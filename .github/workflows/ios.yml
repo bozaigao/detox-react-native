@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
       with:
         fetch-depth: 1
 
@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-node@v3
 
     - name: Cache node modules
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       id: cache
       with:
         path: node_modules
@@ -35,7 +35,7 @@ jobs:
       run: yarn install
 
     - name: Cache Pods
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       id: podcache
       with:
         path: ios/Pods
@@ -48,5 +48,6 @@ jobs:
 
     - run: brew tap wix/brew
     - run: brew install applesimutils
+    - run: sudo xcode-select --reset
     - run: yarn detox build e2e --configuration ios.sim.release
     - run: yarn detox test e2e --configuration ios.sim.release --cleanup --debug-synchronization 200

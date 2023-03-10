@@ -5,10 +5,10 @@ on: [push]
 jobs:
   build:
     runs-on: macos-latest
-    timeout-minutes: 50
+    timeout-minutes: 15
 
     env:
-      DEVELOPER_DIR: /Applications/Xcode_13.1.app
+      DEVELOPER_DIR: /Applications/Xcode_11.2.app
 
     steps:
     - name: Checkout
@@ -19,30 +19,34 @@ jobs:
     - name: Node
       uses: actions/setup-node@v3
 
-    - name: Install node_modules
-      run: |
-        npm install
+    - name: Cache node modules
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('**/yarn.lock') }}
 
-    - name: Pod Install
+    - name: Rebuild detox
+      if: steps.cache.outputs.cache-hit == 'true'
+      run: yarn detox clean-framework-cache && yarn detox build-framework-cache
+
+    - name: Install Dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: yarn install
+
+    - name: Cache Pods
+      uses: actions/cache@v1
+      id: podcache
+      with:
+        path: ios/Pods
+        key: pods-${{ hashFiles('**/Podfile.lock') }}
+
+    - name: Update Pods
       run: |
+        gem update cocoapods xcodeproj
         cd ios && pod install && cd ..
 
-    - name: Install Applesimutils
-      run: |
-        brew tap wix/brew
-        brew install applesimutils
-
-    - name: Start RN Packager
-      run: |
-        npx react-native start &> ios_packager.log &
-
-    - name: Run Detox tests
-      run: |
-        npx detox test --record-videos all --take-screenshots all -c ios
-
-    - name: Upload Test Artifact - GitHub Action
-      if: always()
-      uses: actions/upload-artifact@v2
-      with: 
-        name: artifacts
-        path: artifacts
+    - run: brew tap wix/brew
+    - run: brew install applesimutils
+    - run: yarn detox build e2e --configuration ios.sim.release
+    - run: yarn detox test e2e --configuration ios.sim.release --cleanup --debug-synchronization 200

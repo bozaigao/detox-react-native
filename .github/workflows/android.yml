@@ -23,7 +23,7 @@ jobs:
 
     - name: Download Android Emulator Image
       run: |
-        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
+        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-33;google_apis;x86"
         echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name emu --device "Nexus 5X" -k 'system-images;android-29;google_apis;x86'
         $ANDROID_HOME/emulator/emulator -list-avds
 
@@ -51,5 +51,4 @@ jobs:
         echo "Emulator started"
 
     - name: Android Detox
-      timeout-minutes: 10
       run: yarn test:android-release

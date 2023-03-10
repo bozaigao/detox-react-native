@@ -1,54 +1,58 @@
-name: Android
-
-on: [push]
+# .github/workflows/e2e-android.yml
+name: e2e-android
+on: push
 
 jobs:
-  build:
+  e2e-android:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 1
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Node
-      uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version-file: .node-version
 
-    - name: Use specific Java version for sdkmanager to work
-      uses: actions/setup-java@v3
-      with:
-        java-version: '8'
-        distribution: 'temurin'
+      - name: Install Yarn dependencies
+        run: yarn --frozen-lockfile --prefer-offline
 
-    - name: Download Android Emulator Image
-      run: |
-        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-31;google_apis;x86_64"
-        echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name emu --device "Nexus 5X" -k 'system-images;android-31;google_apis;x86_64'
-        $ANDROID_HOME/emulator/emulator -list-avds
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          cache: gradle
+          distribution: temurin
+          java-version: 17
 
-    - name: Install node_modules
-      run: |
-        yarn install --frozen-lockfile
+      - name: Cache Detox build
+        id: cache-detox-build
+        uses: actions/cache@v3
+        with:
+          path: android/app/build
+          key: ${{ runner.os }}-detox-build
+          restore-keys: |
+            ${{ runner.os }}-detox-build
 
-    - name: Change java sdk version
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'adopt' # See 'Supported distributions' for available options
-        java-version: '11'
-    
-    - name: Build for detox
-      run: |
-        yarn build:android-release
+      - name: Detox build
+        run: yarn detox build --configuration android.emu.release
 
-    - name: Android Emulator
-      continue-on-error: true
-      run: |
-        echo "Starting emulator"
-        nohup $ANDROID_HOME/emulator/emulator -avd emu -no-audio -no-snapshot -no-window &
-        $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
-        $ANDROID_HOME/platform-tools/adb devices
-        echo "Emulator started"
+      - name: Get device name
+        id: device
+        run: node -e "console.log('AVD_NAME=' + require('./.detoxrc').devices.emulator.device.avdName)" >> $GITHUB_OUTPUT
 
-    - name: Android Detox
-      run: yarn test:android-release
+      - name: Detox test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          script: yarn detox test --configuration android.emu.release --headless --record-logs all
+
+      - name: Upload artifacts
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: detox-artifacts
+          path: artifacts

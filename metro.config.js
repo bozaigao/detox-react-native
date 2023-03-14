@@ -12,6 +12,6 @@ try {
 
 module.exports = {
   resolver: {
-    blacklistRE: createBlacklist([/test\/.*/, /detox\/node_modules\/.*/]),
+    // blacklistRE: createBlacklist([/test\/.*/, /detox\/node_modules\/.*/]),
   },
 };

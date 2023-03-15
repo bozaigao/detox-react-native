@@ -51,4 +51,4 @@ jobs:
         echo "Emulator started"
 
     - name: Android Detox
-      run: sudo yarn test:android-release
+      run: ANDROID_SDK_ROOT=/dev/null && sudo yarn test:android-release

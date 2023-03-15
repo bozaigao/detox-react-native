@@ -52,8 +52,8 @@ jobs:
 
     - name: Android Detox
       run: |
-      set ANDROID_SDK_ROOT=Users/runner/Library/Android/sdk
-      set ANDROID_HOME=Users/runner/Library/Android/sdk
-      export ANDROID_HOME=Users/runner/Library/Android/sdk
-      export ANDROID_SDK_ROOT=Users/runner/Library/Android/sdk
-      sudo yarn test:android-release
+       set ANDROID_SDK_ROOT=Users/runner/Library/Android/sdk
+       set ANDROID_HOME=Users/runner/Library/Android/sdk
+       export ANDROID_HOME=Users/runner/Library/Android/sdk
+       export ANDROID_SDK_ROOT=Users/runner/Library/Android/sdk
+       sudo yarn test:android-release

@@ -18,8 +18,10 @@
     "test:android-release": "detox test --configuration android.emu.release",
     "e2e:ios": "npm run build:ios-release && npm run test:ios-release",
     "e2e:android": "npm run build:android-release && npm run test:android-release",
-    "podInstall:ios": "cd ios && bundle exec pod install",
-    "clean:android": "pushd android && ./gradlew clean && popd"
+    "tests:emulator:prepare": "cd .github/workflows/scripts/functions && yarn && yarn build",
+    "tests:emulator:start-ci": "yarn tests:emulator:prepare && cd ./.github/workflows/scripts && ./start-firebase-emulator.sh",
+    "tests:packager:jet-ci": "cd tests && cross-env TMPDIR=$HOME/.metro REACT_DEBUGGER=\"echo nope\" node_modules/.bin/react-native start --no-interactive",
+    "tests:ios:pod:install": "rm -rf ios/example.xcworkspace && yarn pod-install"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.17.3",
